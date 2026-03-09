@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --k: #0d0d0d;
+  --w: #f9f8f6;
+  --g1: #f0efed;
+  --g2: #e0ddd8;
+  --g4: #9e9890;
+  --g6: #5a5650;
+  --red: #b83025;
+  --green: #1a5c3a;
+  --blue: #1a3a5c;
+  --font: 'IBM Plex Mono', monospace;
+}
+
+body {
+  background: var(--w);
+  font-family: var(--font);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+input, textarea, button { font-family: var(--font); }
+input:focus, textarea:focus { outline: none; }
+button { cursor: pointer; border: none; background: none; }
+textarea { resize: none; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--g2); border-radius: 2px; }
+
+.fade-in { animation: fi .18s ease; }
+@keyframes fi {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hov-row:hover { background: var(--g1); }
+.drag-top    { border-top: 2px solid var(--k) !important; }
+.drag-bot    { border-bottom: 2px solid var(--k) !important; }
+.dragging    { opacity: .3; }
+
+@media (max-width: 600px) {
+  .home-wrap { padding: 24px 20px !important; }
+  .doc-wrap  { padding: 20px 16px 80px !important; }
+  .doc-header { padding: 12px 16px !important; }
+}
