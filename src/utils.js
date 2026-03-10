@@ -211,3 +211,54 @@ export function docSummary(doc) {
     return u === '€' ? fmt + ' €' : u === '$' ? '$ ' + fmt : fmt + (u ? ' ' + u : '');
   }).join(' · ');
 }
+
+// ─── DEINDENT (sube un nivel en la jerarquía) ─────────────────────────────────
+export function deindentInTree(blocks, id, parentChildren = null, parentId = null) {
+  // Check if block is a direct child of current level
+  const idx = blocks.findIndex(b => b.id === id);
+  if (idx !== -1 && parentChildren !== null) {
+    const block = blocks[idx];
+    const newParentChildren = blocks.filter((_, i) => i !== idx);
+    // Insert after parent in grandparent's list
+    const parentIdx = parentChildren.findIndex(b => b.id === parentId);
+    const newGrandChildren = [...parentChildren];
+    newGrandChildren[parentIdx] = { ...newGrandChildren[parentIdx], children: newParentChildren };
+    newGrandChildren.splice(parentIdx + 1, 0, block);
+    return newGrandChildren;
+  }
+  return blocks.map(b => {
+    const childIdx = (b.children || []).findIndex(c => c.id === id);
+    if (childIdx !== -1) {
+      const child = b.children[childIdx];
+      const newChildren = b.children.filter((_, i) => i !== childIdx);
+      const siblings = blocks;
+      const bIdx = siblings.findIndex(s => s.id === b.id);
+      const result = [...siblings];
+      result[bIdx] = { ...b, children: newChildren };
+      result.splice(bIdx + 1, 0, child);
+      return null; // mark for removal, handled below
+    }
+    return { ...b, children: deindentInTree(b.children || [], id, b.children, b.id) };
+  }).filter(Boolean);
+}
+
+// ─── MOVE UP / DOWN within same level ────────────────────────────────────────
+export function moveUpInTree(blocks, id) {
+  const idx = blocks.findIndex(b => b.id === id);
+  if (idx > 0) {
+    const a = [...blocks];
+    [a[idx - 1], a[idx]] = [a[idx], a[idx - 1]];
+    return a;
+  }
+  return blocks.map(b => ({ ...b, children: moveUpInTree(b.children || [], id) }));
+}
+
+export function moveDownInTree(blocks, id) {
+  const idx = blocks.findIndex(b => b.id === id);
+  if (idx !== -1 && idx < blocks.length - 1) {
+    const a = [...blocks];
+    [a[idx], a[idx + 1]] = [a[idx + 1], a[idx]];
+    return a;
+  }
+  return blocks.map(b => ({ ...b, children: moveDownInTree(b.children || [], id) }));
+}
